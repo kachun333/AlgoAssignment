@@ -26,15 +26,6 @@ MAX_LATITUDE = 90.
 MIN_LONGITUDE = -180.
 MAX_LONGITUDE = 180.
 
-locations = []
-locations.append({'name':'Kuala Lumpur', 'lat':2.7456, 'lon':101.7072})
-locations.append({'name':'Brasilia', 'lat':-15.8697, 'lon':-47.9172})
-locations.append({'name':'Tokyo', 'lat':35.5494, 'lon':139.7798})
-locations.append({'name':'London', 'lat':51.5048, 'lon':0.0495})
-locations.append({'name':'New York', 'lat':40.6413, 'lon':-73.7781})
-locations.append({'name':'Bangkok', 'lat':13.6900, 'lon':100.7501})
-locations.append({'name':'Kabul', 'lat':34.5609, 'lon':69.2101})
-
 
 class LineMapLayer(MapLayer):
     def __init__(self, **kwargs):
@@ -179,12 +170,38 @@ class MapViewApp(App):
         self.root.add_widget(b)
 
 
+locations = {}
+locations['Kuala Lumpur'] = {'lat':2.7456, 'lon':101.7072}
+locations['Brasilia'] = {'lat':-15.8697, 'lon':-47.9172}
+locations['Tokyo'] = {'lat':35.5494, 'lon':139.7798}
+locations['London'] = {'lat':51.5048, 'lon':0.0495}
+locations['New York'] = {'lat':40.6413, 'lon':-73.7781}
+locations['Bangkok'] = {'lat':13.6900, 'lon':100.7501}
+locations['Kabul'] = {'lat':34.5609, 'lon':69.2101}
+destinations = ['Kuala Lumpur', 'Brasilia', 'Tokyo', 'London', 'New York', 'Bangkok', 'Kabul']
+
+
 class MainScreen(BoxLayout):
+
+    def choose_destination(self, instance):
+        self.destination = instance.text
+        self.line.coordinates=[[2.7456, 101.7072], [locations[instance.text]['lat'], locations[instance.text]['lon']]]
+        pass
 
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
         self.orientation = 'horizontal'
-        self.add_widget(Label(text='User Name'))
+        self.destination = 'Kuala Lumpur'
+        
+        left_layout = BoxLayout(orientation = 'vertical')
+        left_layout.add_widget(Label(text='From Kuala Lumpur\nTo {}'.format(self.destination)))
+        for d in destinations:
+            btn = Button(text=d)
+            #btn.bind(state=self.choose_destination)
+            btn.bind(on_press=self.choose_destination)
+            left_layout.add_widget(btn)
+        self.add_widget(left_layout)
+        
         self.mapview = MapView(zoom=8, lat=2.7456, lon=101.7072, size_hint=(1.8, 1))
         #self.mapview.add_widget(MapMarker(lat=2.7456, lon=101.7072))
         self.addMaker()
@@ -193,8 +210,8 @@ class MainScreen(BoxLayout):
         self.line.coordinates=[[2.7456, 101.7072], [1.7456, 80.7072]]
     
     def addMaker(self):
-        for l in locations:
-            self.mapview.add_widget(MapMarker(lat=l['lat'], lon=l['lon']))
+        for l in locations.keys():
+            self.mapview.add_widget(MapMarker(lat=locations[l]['lat'], lon=locations[l]['lon']))
         self.line = LineMapLayer()
         self.mapview.add_layer(self.line, mode="scatter")
 
