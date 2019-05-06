@@ -83,10 +83,10 @@ class LineMapLayer(MapLayer):
 
     def reposition(self):
         mapview = self.parent
-
+        print(mapview.zoom)
         # Must redraw when the zoom changes
         # as the scatter transform resets for the new tiles
-        if (self.zoom != mapview.zoom):
+        if (True):#self.zoom != mapview.zoom):
             map_source = mapview.map_source
             self.ms = pow(2.0, mapview.zoom) * map_source.dp_tile_size
             self.invalidate_line_points()
@@ -103,7 +103,7 @@ class LineMapLayer(MapLayer):
     def _draw_line(self, *args):
         mapview = self.parent
         self.zoom = mapview.zoom
-
+        
         # When zooming we must undo the current scatter transform
         # or the animation distorts it
         scatter = mapview._scatter
@@ -164,8 +164,8 @@ class MapViewApp(App):
         
         self.root.add_widget(layout)
         b = BoxLayout(orientation='horizontal',height='32dp',size_hint_y=None)
-        b.add_widget(Button(text="Zoom in",on_press=lambda a: setattr(self.mapview,'zoom',self.mapview.zoom+1)))
-        b.add_widget(Button(text="Zoom out",on_press=lambda a: setattr(self.mapview,'zoom',self.mapview.zoom-1)))
+        b.add_widget(Button(text="Zoom in",on_press=lambda a: setattr(self.mapview,'zoom',clamp(self.mapview.zoom+1, 0, 10))))
+        b.add_widget(Button(text="Zoom out",on_press=lambda a: setattr(self.mapview,'zoom',clamp(self.mapview.zoom-1, 0, 10))))
         b.add_widget(Button(text="AddPoint",on_press=lambda a: line.add_point()))
         self.root.add_widget(b)
 
@@ -178,7 +178,8 @@ locations['London'] = {'lat':51.5048, 'lon':0.0495}
 locations['New York'] = {'lat':40.6413, 'lon':-73.7781}
 locations['Bangkok'] = {'lat':13.6900, 'lon':100.7501}
 locations['Kabul'] = {'lat':34.5609, 'lon':69.2101}
-destinations = ['Kuala Lumpur', 'Brasilia', 'Tokyo', 'London', 'New York', 'Bangkok', 'Kabul']
+locations['California'] = {'lat':33.6762, 'lon':-117.8675} # testing purpose
+destinations = ['Kuala Lumpur', 'Brasilia', 'Tokyo', 'London', 'New York', 'Bangkok', 'Kabul', 'California']
 
 
 class MainScreen(BoxLayout):
@@ -186,7 +187,7 @@ class MainScreen(BoxLayout):
     def choose_destination(self, instance):
         self.destination = instance.text
         self.line.coordinates=[[2.7456, 101.7072], [locations[instance.text]['lat'], locations[instance.text]['lon']]]
-        pass
+        self.left_label.text = 'From Kuala Lumpur\nTo {}'.format(self.destination)
 
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
@@ -194,12 +195,17 @@ class MainScreen(BoxLayout):
         self.destination = 'Kuala Lumpur'
         
         left_layout = BoxLayout(orientation = 'vertical')
-        left_layout.add_widget(Label(text='From Kuala Lumpur\nTo {}'.format(self.destination)))
+        self.left_label = Label(text='From Kuala Lumpur\nTo {}'.format(self.destination))
+        left_layout.add_widget(self.left_label)
         for d in destinations:
             btn = Button(text=d)
             #btn.bind(state=self.choose_destination)
             btn.bind(on_press=self.choose_destination)
             left_layout.add_widget(btn)
+        b = BoxLayout(orientation='horizontal',height='32dp',size_hint_y=None)
+        b.add_widget(Button(text="Zoom in",on_press=lambda a: setattr(self.mapview,'zoom',clamp(self.mapview.zoom+1, 3, 10))))
+        b.add_widget(Button(text="Zoom out",on_press=lambda a: setattr(self.mapview,'zoom',clamp(self.mapview.zoom-1, 3, 10))))
+        left_layout.add_widget(b)
         self.add_widget(left_layout)
         
         self.mapview = MapView(zoom=8, lat=2.7456, lon=101.7072, size_hint=(1.8, 1))
@@ -207,7 +213,7 @@ class MainScreen(BoxLayout):
         self.addMaker()
         self.add_widget(self.mapview)
         self.line.reposition()
-        self.line.coordinates=[[2.7456, 101.7072], [1.7456, 80.7072]]
+        self.line.coordinates=[[2.7456, 101.7072], [2.7456, 101.7072]]
     
     def addMaker(self):
         for l in locations.keys():
