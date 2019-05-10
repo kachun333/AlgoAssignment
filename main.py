@@ -2,7 +2,7 @@ import random
 from math import *
 
 from kivy.core.window import Window 
-Window. size = (1920, 1080)
+Window. size = (1000, 600)
 
 from kivy.properties import NumericProperty, ObjectProperty, ListProperty, AliasProperty, BooleanProperty, StringProperty
 from kivy.app import App
@@ -65,21 +65,27 @@ locations['London'] = {'lat':51.5048, 'lon':0.0495}
 locations['New York'] = {'lat':40.6413, 'lon':-73.7781}
 locations['Bangkok'] = {'lat':13.6900, 'lon':100.7501}
 locations['Kabul'] = {'lat':34.5609, 'lon':69.2101}
-locations['California'] = {'lat':33.6762, 'lon':-117.8675} # testing purpose
-destinations = ['Kuala Lumpur', 'Brasilia', 'Tokyo', 'London', 'New York', 'Bangkok', 'Kabul', 'California']
+#locations['California'] = {'lat':33.6762, 'lon':-117.8675} # testing purpose
+destinations = ['Kuala Lumpur', 'Brasilia', 'Tokyo', 'London', 'New York', 'Bangkok', 'Kabul']
 
 
 class MainScreen(BoxLayout):
 
     def choose_destination(self, instance):
         self.destination = instance.text
+        self.path = "Kuala Lumpur,"+instance.text
+        self.path = self.path.replace(' ', '+')
+        print(self.path)
         self.line.coordinates=[[2.7456, 101.7072], [locations[instance.text]['lat'], locations[instance.text]['lon']]]
         self.left_label.text = 'From Kuala Lumpur\nTo {}'.format(self.destination)
+        self.webview.url = "https://waixiong.github.io/AlgoAssisgnmentMap/map.html?path="+self.path+"&id=1234"
+        #self.webview.reload()
 
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
         self.orientation = 'horizontal'
-        self.destination = 'Kuala Lumpur'
+        self.destination = 'Tokyo'
+        self.path = "Kuala+Lumpur,Tokyo"
         
         left_layout = BoxLayout(orientation = 'vertical')
         self.left_label = Label(text='From Kuala Lumpur\nTo {}'.format(self.destination))
@@ -99,7 +105,7 @@ class MainScreen(BoxLayout):
         #self.mapview.add_widget(MapMarker(lat=2.7456, lon=101.7072))
         self.addMaker()
         # "./map.html?path=Kuala+Lumpur,Tokyo,New+York&id=1234"
-        self.webview = CEFBrowser(url="file:///home/thechee/Documents/Acedemic/S2_19/WIA2005/AlgoAssignment/map.html?path=Kuala+Lumpur,Tokyo,New+York&id=1234", size_hint=(1.8, 1))
+        self.webview = CEFBrowser(url="https://waixiong.github.io/AlgoAssisgnmentMap/map.html?path="+self.path+"&id=1234", size_hint=(1.8, 1))
         self.add_widget(self.webview)
         self.line.reposition()
         self.line.coordinates=[[2.7456, 101.7072], [2.7456, 101.7072]]
