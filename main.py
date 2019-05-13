@@ -27,34 +27,34 @@ from mapview.utils import clamp
 from kivy.garden.cefpython import CEFBrowser
 
 from lineMap import LineMapLayer
+from distance import *
 
-
-class MapViewApp(App):
-    mapview = None
+# class MapViewApp(App):
+#     mapview = None
  
-    def __init__(self, **kwargs):
-        super(MapViewApp, self).__init__(**kwargs)
-        Clock.schedule_once(self.post, 0)
+#     def __init__(self, **kwargs):
+#         super(MapViewApp, self).__init__(**kwargs)
+#         Clock.schedule_once(self.post, 0)
  
-    def build(self):
-        layout = BoxLayout(orientation='vertical')
-        return layout
+#     def build(self):
+#         layout = BoxLayout(orientation='vertical')
+#         return layout
  
-    def post(self, *args):
-        layout = FloatLayout()
-        self.mapview = MapView(zoom=9, lat=2.7456, lon=101.7072)
-        #for l in locations:
-        #    self.mapview.add_widget(MapMarker(lat=l['lat'], lon=l['lon']))
-        line = LineMapLayer()
-        self.mapview.add_layer(line, mode="scatter")  # window scatter
-        layout.add_widget(self.mapview)
+#     def post(self, *args):
+#         layout = FloatLayout()
+#         self.mapview = MapView(zoom=9, lat=2.7456, lon=101.7072)
+#         #for l in locations:
+#         #    self.mapview.add_widget(MapMarker(lat=l['lat'], lon=l['lon']))
+#         line = LineMapLayer()
+#         self.mapview.add_layer(line, mode="scatter")  # window scatter
+#         layout.add_widget(self.mapview)
         
-        self.root.add_widget(layout)
-        b = BoxLayout(orientation='horizontal',height='32dp',size_hint_y=None)
-        b.add_widget(Button(text="Zoom in",on_press=lambda a: setattr(self.mapview,'zoom',clamp(self.mapview.zoom+1, 0, 10))))
-        b.add_widget(Button(text="Zoom out",on_press=lambda a: setattr(self.mapview,'zoom',clamp(self.mapview.zoom-1, 0, 10))))
-        b.add_widget(Button(text="AddPoint",on_press=lambda a: line.add_point()))
-        self.root.add_widget(b)
+#         self.root.add_widget(layout)
+#         b = BoxLayout(orientation='horizontal',height='32dp',size_hint_y=None)
+#         b.add_widget(Button(text="Zoom in",on_press=lambda a: setattr(self.mapview,'zoom',clamp(self.mapview.zoom+1, 0, 10))))
+#         b.add_widget(Button(text="Zoom out",on_press=lambda a: setattr(self.mapview,'zoom',clamp(self.mapview.zoom-1, 0, 10))))
+#         b.add_widget(Button(text="AddPoint",on_press=lambda a: line.add_point()))
+#         self.root.add_widget(b)
 
 
 locations = {}
@@ -68,12 +68,27 @@ locations['Kabul'] = {'lat':34.5609, 'lon':69.2101}
 #locations['California'] = {'lat':33.6762, 'lon':-117.8675} # testing purpose
 destinations = ['Kuala Lumpur', 'Brasilia', 'Tokyo', 'London', 'New York', 'Bangkok', 'Kabul']
 
+#initialize graph
+graph = Graph([])
+for i in range(len(destinations)):
+    for j in range(i+1, len(destinations)):
+        distance = calculate(locations[destinations[i]]['lat'], locations[destinations[i]]['lon'], locations[destinations[j]]['lat'], locations[destinations[j]]['lon'])
+        graph.add_edge(destinations[i], destinations[j], cost=distance)
+
 
 class MainScreen(BoxLayout):
 
     def choose_destination(self, instance):
         self.destination = instance.text
-        self.path = "Kuala Lumpur,"+instance.text
+        
+        graph.remove_edge('Kuala Lumpur', instance.text)
+        p = graph.dijkstra('Kuala Lumpur', instance.text)
+        graph.add_edge('Kuala Lumpur', instance.text, cost=calculate(locations['Kuala Lumpur']['lat'], locations['Kuala Lumpur']['lon'], locations[instance.text]['lat'], locations[instance.text]['lon']))
+        
+        self.path = "Kuala Lumpur,"
+        while len(p) > 0:
+            self.path += str(p.popleft())+','
+        self.path = self.path[0:-1]
         self.path = self.path.replace(' ', '+')
         print(self.path)
         self.line.coordinates=[[2.7456, 101.7072], [locations[instance.text]['lat'], locations[instance.text]['lon']]]
