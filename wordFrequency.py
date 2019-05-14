@@ -1,10 +1,11 @@
 import os;
 from article import article;
+
 #user input
 city = {1:"Brasilia", 2:"NewYork", 3:"London"}
 #print(city)
 # city_chosen = int(input("Choose a city by key in its number"))
-city_chosen = 3;
+city_chosen = 1;
 
 #specify path
 path = "D:/um/Semester 4/WIA2005 Algorithm Design and Analysis/Assignment";
@@ -17,5 +18,5 @@ i =0
 for x in files:
     filename = path+"/"+files[i]
     articles.append(article(filename))
-    print("Article " + str(i) + ": " + str(articles[i].getOriTotal()))
+    print("Article " + str(i) + ": " + str(articles[i].getNoStopTotal()))
     i +=1
