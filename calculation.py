@@ -4,9 +4,6 @@ class calculation:
 
     NO_OF_CHARS = 256
 def getNextState(pat, M, state, x):
-    '''
-    calculate the next state
-    '''
 
     # If the character c is same as next character
       # in pattern, then simply increment state
@@ -33,10 +30,7 @@ def getNextState(pat, M, state, x):
     return 0
 
 def computeTF(pat, M):
-    '''
-    This function builds the TF table which
-    represents Finite Automata for a given pattern
-    '''
+
     global NO_OF_CHARS
 
     TF = [[0 for i in range(NO_OF_CHARS)]\
@@ -50,9 +44,7 @@ def computeTF(pat, M):
     return TF
 
 def search(pat, txt):
-    '''
-    Prints all occurrences of pat in txt
-    '''
+
     global NO_OF_CHARS
     M = len(pat)
     N = len(txt)
@@ -71,6 +63,3 @@ def main():
     txt = "AABAACAADAABAAABAA"
     pat = "AABA"
     search(pat, txt)
-
-if __name__ == '__main__':
-    main()

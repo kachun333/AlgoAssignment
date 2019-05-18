@@ -1,18 +1,19 @@
 import time
+import os
 from RabinKarp import RabinKarp
 
 class article:
     #read file and store each words in a list named text
+
+
     def __init__(self,filename):
         text_file=open(filename,"r")
-        self.__words = text_file.read().lower()
-        self.__noStopText = self.__removeStop(self.__words)
-        self.__words = self.__words.split()
-        self.__noStopWords = self.__noStopText.split()
+        self.__words = text_file.read().lower().split()
         text_file.close()
+        self.__noStopWords = self.__words[:]
+        self.__freqN = 0
+        self.__freqP = 0
 
-    def functionA(self, text):
-        return text
     #count number of words
     def getTotal(self, list):
         return len(list)
@@ -34,55 +35,77 @@ class article:
 
      #Total num of words in file b4 removing stop words
     def getNoStopTotal(self):
+        self.__noStopWords = self.__removeStop(self.__noStopWords)
         return self.getTotal(self.__noStopWords)
 
     #dictionary of all words b4 removing stop Words
     def getNoStopWords(self):
+        self.__noStopWords = self.__removeStop(self.__noStopWords)
         return self.getWords(self.__noStopWords)
 
-    def getNoStopText(self):
-        return
+    def getPolarity(self):
+        self.calculateWords()
+        polarity = (self.__freqP - self.__freqN)/self.getOriTotal()
+        return polarity
 
-    def __removeStop(self,text):
+    def getPosCount(self):
+        self.calculateWords()
+        return self.__freqP
+
+    def getNegCount(self):
+        self.calculateWords()
+        return self.__freqN
+
+    def __removeStop(self,list):
         # q = self.primeNum()
         # store a list of stop words
         stopWords = []
-        path = "D:/um/Semester 4/WIA2005 Algorithm Design and Analysis/Assignment"
-        text_file=open(path+"/Webpage_txt/stop_words.txt","r")
+        ROOT = os.path.dirname(os.path.abspath(__file__))
+        text_file=open(ROOT+"/Webpage_txt/stop_words.txt","r")
         stopWords = text_file.read().lower().split()
         text_file.close()
         #remove stop words 1 by 1
         for x in stopWords:
-            self.search(x,text)
-        print(text)
-        return text
-
-    #get the smallest prime num after total num of words in file
-    # def primeNum(self):
-    #     nextPrime = 10
-    #     isPrime = False
-    #     while(isPrime == False):
-    #         time.sleep(0.1)
-    #         isPrime = True
-    #         for num in range(2,nextPrime):
-    #             if (nextPrime % num == 0):
-    #                 isPrime = False
-    #                 break
-    #         nextPrime +=1
-    #     return nextPrime
+            self.search(x,list)
+        return list
 
     #search using Rabin-Karp Algorithm
-    def search(self, pattern, text):
-        text_hash = RabinKarp(text, len(text))
-        pattern_hash = RabinKarp(pattern, len(pattern))
+    def search(self, pattern, list):
+        for j in list:
+            text_hash = RabinKarp(j, len(j))
+            pattern_hash = RabinKarp(pattern, len(pattern))
 
-        for i in range(len(text) - len(pattern) + 1):
-            if text_hash.hash == pattern_hash.hash:
-                if text_hash.window_text() == pattern:
-                    text[i:i+len(pattern)+1]=""
+            for i in range(len(j) - len(pattern) + 1):
+                if text_hash.hash == pattern_hash.hash:
+                    if text_hash.window_text() == pattern:
+                        list.remove(j)
 
-    #print all
-    def output(self):
-        print("Before removing stop words")
-        print(self.getOriWords)
-        print("The total words in the file is "+ self.getOriTotal)
+    def tempSearch(self, pattern, list):
+        for j in list:
+            text_hash = RabinKarp(j, len(j))
+            pattern_hash = RabinKarp(pattern, len(pattern))
+
+            for i in range(len(j) - len(pattern) + 1):
+                if text_hash.hash == pattern_hash.hash:
+                    if text_hash.window_text() == pattern:
+                        return True
+        return False
+
+
+    def calculateWords(self):
+        ROOT = os.path.dirname(os.path.abspath(__file__))
+        #Negative words
+        text_file=open(ROOT+"/Webpage_txt/Negative Words Reference.txt","r")
+        pos_words = text_file.read().lower().split()
+        text_file.close()
+
+        #positive words
+        text_file=open(ROOT+"/Webpage_txt/Positive Words Reference.txt","r")
+        neg_words = text_file.read().lower().split()
+        text_file.close()
+        #check all the words in the articles
+        for i in self.__words:
+            if(self.tempSearch(i,pos_words) == True):
+                self.__freqP += 1
+            else:
+                self.__freqN += 1
