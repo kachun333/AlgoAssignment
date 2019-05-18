@@ -1,15 +1,18 @@
+import time
+from RabinKarp import RabinKarp
 
 class article:
-    text = []
-    noStop = []
-
     #read file and store each words in a list named text
     def __init__(self,filename):
         text_file=open(filename,"r")
-        self.text= text_file.read().lower().split()
-        #self.noStop = removeStop(text_file.read().lower()).split()
+        self.__words = text_file.read().lower()
+        self.__noStopText = self.__removeStop(self.__words)
+        self.__words = self.__words.split()
+        self.__noStopWords = self.__noStopText.split()
         text_file.close()
 
+    def functionA(self, text):
+        return text
     #count number of words
     def getTotal(self, list):
         return len(list)
@@ -23,83 +26,63 @@ class article:
 
      #Total num of words in file b4 removing stop words
     def getOriTotal(self):
-        return self.getTotal(self.text)
+        return self.getTotal(self.__words)
 
     #dictionary of all words b4 removing stop Words
     def getOriWords(self):
-        return self.getWords(self.text)
+        return self.getWords(self.__words)
 
      #Total num of words in file b4 removing stop words
     def getNoStopTotal(self):
-        return self.getTotal(self.noStop)
+        return self.getTotal(self.__noStopWords)
 
     #dictionary of all words b4 removing stop Words
     def getNoStopWords(self):
-        return self.getWords(self.noStop)
+        return self.getWords(self.__noStopWords)
 
-    def removeStop(self,text):
-        q = self.primeNum(getOriTotal)
-        self.search(pattern, text, q)
+    def getNoStopText(self):
+        return
+
+    def __removeStop(self,text):
+        # q = self.primeNum()
+        # store a list of stop words
+        stopWords = []
+        path = "D:/um/Semester 4/WIA2005 Algorithm Design and Analysis/Assignment"
+        text_file=open(path+"/Webpage_txt/stop_words.txt","r")
+        stopWords = text_file.read().lower().split()
+        text_file.close()
+        #remove stop words 1 by 1
+        for x in stopWords:
+            self.search(x,text)
+        print(text)
         return text
 
     #get the smallest prime num after total num of words in file
-    def primeNum(self, min):
-        # for possiblePrime in range(2, 21):
-        #     # Assume number is prime until shown it is not.
-        #     isPrime = True
-        #     for num in range(2, possiblePrime):
-        #         if possiblePrime % num == 0:
-        #             isPrime = False
-        return 1511;
+    # def primeNum(self):
+    #     nextPrime = 10
+    #     isPrime = False
+    #     while(isPrime == False):
+    #         time.sleep(0.1)
+    #         isPrime = True
+    #         for num in range(2,nextPrime):
+    #             if (nextPrime % num == 0):
+    #                 isPrime = False
+    #                 break
+    #         nextPrime +=1
+    #     return nextPrime
 
-    #Rabin-Karp Algorithm
-    def search(pat, txt, q):
-        M = len(pat)
-        N = len(txt)
-        i = 0
-        j = 0
-        p = 0    # hash value for pattern
-        t = 0    # hash value for txt
-        h = 1
+    #search using Rabin-Karp Algorithm
+    def search(self, pattern, text):
+        text_hash = RabinKarp(text, len(text))
+        pattern_hash = RabinKarp(pattern, len(pattern))
 
-        # The value of h would be "pow(d, M-1)% q"
-        for i in range(M-1):
-            h = (h * d)% q
-
-        # Calculate the hash value of pattern and first window of text
-        for i in range(M):
-            p = (d * p + ord(pat[i]))% q
-            t = (d * t + ord(txt[i]))% q
-
-        # Slide the pattern over text one by one
-        for i in range(N-M + 1):
-            # Check the hash values of current window of text and
-            # pattern if the hash values match then only check
-            # for characters on by one
-            if p == t:
-                # Check for characters one by one
-                for j in range(M):
-                    if txt[i + j] != pat[j]:
-                        break
-
-                j+= 1
-                # if p == t and pat[0...M-1] = txt[i, i + 1, ...i + M-1]
-                if j == M:
-                    print("Pattern found at index " + str(i))
-
-            # Calculate hash value for next window of text: Remove
-            # leading digit, add trailing digit
-            if i < N-M:
-                t = (d*(t-ord(txt[i])*h) + ord(txt[i + M]))% q
-
-                # We might get negative values of t, converting it to
-                # positive
-                if t < 0:
-                    t = t + q
+        for i in range(len(text) - len(pattern) + 1):
+            if text_hash.hash == pattern_hash.hash:
+                if text_hash.window_text() == pattern:
+                    text[i:i+len(pattern)+1]=""
 
     #print all
     def output(self):
         print("Before removing stop words")
-        print("Output: Words - Frequency")
         print(self.getOriWords)
         print("The total words in the file is "+ self.getOriTotal)
