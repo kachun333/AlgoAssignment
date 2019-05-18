@@ -21,6 +21,7 @@ for x in files:
     print("Article " + str(i) + ": " + str(articles[i].getNoStopTotal())+ " FROM " + str(articles[i].getOriTotal()))
     i +=1
 
+articles[1].calculateWords()    #preprocessing
 print("article pos word is " + str(articles[1].getPosCount()))
 print("article neg word is " + str(articles[1].getNegCount()))
 

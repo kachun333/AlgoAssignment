@@ -49,11 +49,9 @@ class article:
         return polarity
 
     def getPosCount(self):
-        self.calculateWords()
         return self.__freqP
 
     def getNegCount(self):
-        self.calculateWords()
         return self.__freqN
 
     def __removeStop(self,list):
@@ -104,7 +102,7 @@ class article:
         neg_words = text_file.read().lower().split()
         text_file.close()
         #check all the words in the articles
-        for i in self.__words:
+        for i in self.__noStopWords:
             if(self.tempSearch(i,pos_words) == True):
                 self.__freqP += 1
             else:
