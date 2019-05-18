@@ -44,7 +44,6 @@ class article:
         return self.getWords(self.__noStopWords)
 
     def getPolarity(self):
-        self.calculateWords()
         polarity = (self.__freqP - self.__freqN)/self.getOriTotal()
         return polarity
 
