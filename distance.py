@@ -8,6 +8,16 @@ from math import radians, sin, cos, acos
 
 from collections import deque, namedtuple
 
+locations = {}
+locations['Kuala Lumpur'] = {'lat':2.7456, 'lon':101.7072}
+locations['Brasilia'] = {'lat':-15.8697, 'lon':-47.9172}
+locations['Tokyo'] = {'lat':35.5494, 'lon':139.7798}
+locations['London'] = {'lat':51.5048, 'lon':0.0495}
+locations['New York'] = {'lat':40.6413, 'lon':-73.7781}
+locations['Bangkok'] = {'lat':13.6900, 'lon':100.7501}
+locations['Kabul'] = {'lat':34.5609, 'lon':69.2101}
+#locations['California'] = {'lat':33.6762, 'lon':-117.8675} # testing purpose
+destinations = ['Kuala Lumpur', 'Brasilia', 'Tokyo', 'London', 'New York', 'Bangkok', 'Kabul']
 
 # we'll use infinity as a default distance to nodes.
 inf = float('inf')
@@ -88,13 +98,93 @@ class Graph:
                     distances[neighbour] = alternative_route
                     previous_vertices[neighbour] = current_vertex
 
-        path, current_vertex = deque(), dest
+        path, current_vertex, d = deque(), dest, 0
         while previous_vertices[current_vertex] is not None:
             path.appendleft(current_vertex)
+            d = d + calculate(locations[current_vertex]['lat'], locations[current_vertex]['lon'], locations[previous_vertices[current_vertex]]['lat'], locations[previous_vertices[current_vertex]]['lon'])
             current_vertex = previous_vertices[current_vertex]
         if path:
             path.appendleft(current_vertex)
-        return path
+        return pathHolder(path, d)
+
+
+class pathHolder:
+
+    def __init__(self, path, distance):
+        self.path = path
+        self.distance = distance
+    
+    def __gt__(self, holder2):
+        return self.distance > holder2.distance
+    
+    def __str__(self):
+        return '{' + str(self.distance) + '}'
+
+    def __repr__(self):
+        return str(self)
+    
+    def __eq__(self, holder2):
+        return self.distance == holder2.distance
+
+
+class MapGraph:
+
+    def __init__(self):
+        self.locations = {}
+        self.locations['Kuala Lumpur'] = {'lat':2.7456, 'lon':101.7072}
+        self.locations['Brasilia'] = {'lat':-15.8697, 'lon':-47.9172}
+        self.locations['Tokyo'] = {'lat':35.5494, 'lon':139.7798}
+        self.locations['London'] = {'lat':51.5048, 'lon':0.0495}
+        self.locations['New York'] = {'lat':40.6413, 'lon':-73.7781}
+        self.locations['Bangkok'] = {'lat':13.6900, 'lon':100.7501}
+        self.locations['Kabul'] = {'lat':34.5609, 'lon':69.2101}
+        #locations['California'] = {'lat':33.6762, 'lon':-117.8675} # testing purpose
+        self.destinations = ['Kuala Lumpur', 'Brasilia', 'Tokyo', 'London', 'New York', 'Bangkok', 'Kabul']
+
+        #initialize graph
+        self.graph = Graph([])
+        for i in range(len(self.destinations)):
+            for j in range(i+1, len(self.destinations)):
+                distance = calculate(self.locations[self.destinations[i]]['lat'], self.locations[self.destinations[i]]['lon'], self.locations[self.destinations[j]]['lat'], self.locations[self.destinations[j]]['lon'])
+                self.graph.add_edge(self.destinations[i], self.destinations[j], cost=distance)
+    
+    def getPathsCondition(self, destination, paths, r=[]):
+        print(len(paths))
+        if len(r) > 3:
+            return
+        for i in range(0, len(r)-1):
+            self.graph.remove_edge(r[i], r[i+1])
+            p = self.graph.dijkstra('Kuala Lumpur', destination)
+            paths.append(p)
+            l = list(p.path)
+            print(p.path)
+            try:
+                self.getPathsCondition(destination, paths, l)
+            except:
+                pass
+            self.graph.add_edge(r[i], r[i+1], cost=calculate(self.locations[r[i]]['lat'], self.locations[r[i]]['lon'], self.locations[r[i+1]]['lat'], self.locations[r[i+1]]['lon']))
+        pass
+
+    def getPaths(self, destination):
+        paths = []
+        self.graph.remove_edge('Kuala Lumpur', destination)
+        p = self.graph.dijkstra('Kuala Lumpur', destination)
+        paths.append(p)
+        l = list(p.path)
+        self.getPathsCondition(destination, paths, l)
+        self.graph.add_edge('Kuala Lumpur', destination, cost=calculate(self.locations['Kuala Lumpur']['lat'], self.locations['Kuala Lumpur']['lon'], self.locations[destination]['lat'], self.locations[destination]['lon']))
+        paths.sort()
+
+        #remove similiar#
+        i = 0
+        while i < len(paths)-1:
+            if paths[i] == paths[i+1]:
+                del paths[i+1]
+            else:
+                i += 1
+        
+        #print(paths)
+        return paths[0:5]
 
 
 def calculate(lat1, lon1, lat2, lon2):

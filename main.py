@@ -28,6 +28,7 @@ from kivy.garden.cefpython import CEFBrowser
 
 from lineMap import LineMapLayer
 from distance import *
+from distance import MapGraph
 
 # class MapViewApp(App):
 #     mapview = None
@@ -69,11 +70,11 @@ locations['Kabul'] = {'lat':34.5609, 'lon':69.2101}
 destinations = ['Kuala Lumpur', 'Brasilia', 'Tokyo', 'London', 'New York', 'Bangkok', 'Kabul']
 
 #initialize graph
-graph = Graph([])
-for i in range(len(destinations)):
-    for j in range(i+1, len(destinations)):
-        distance = calculate(locations[destinations[i]]['lat'], locations[destinations[i]]['lon'], locations[destinations[j]]['lat'], locations[destinations[j]]['lon'])
-        graph.add_edge(destinations[i], destinations[j], cost=distance)
+graph = MapGraph()
+# for i in range(len(destinations)):
+#     for j in range(i+1, len(destinations)):
+#         distance = calculate(locations[destinations[i]]['lat'], locations[destinations[i]]['lon'], locations[destinations[j]]['lat'], locations[destinations[j]]['lon'])
+#         graph.add_edge(destinations[i], destinations[j], cost=distance)
 
 
 class MainScreen(BoxLayout):
@@ -81,13 +82,17 @@ class MainScreen(BoxLayout):
     def choose_destination(self, instance):
         self.destination = instance.text
         
-        graph.remove_edge('Kuala Lumpur', instance.text)
-        p = graph.dijkstra('Kuala Lumpur', instance.text)
-        graph.add_edge('Kuala Lumpur', instance.text, cost=calculate(locations['Kuala Lumpur']['lat'], locations['Kuala Lumpur']['lon'], locations[instance.text]['lat'], locations[instance.text]['lon']))
-        
-        self.path = "Kuala Lumpur,"
+        # graph.remove_edge('Kuala Lumpur', instance.text)
+        # p = graph.dijkstra('Kuala Lumpur', instance.text)
+        # graph.add_edge('Kuala Lumpur', instance.text, cost=calculate(locations['Kuala Lumpur']['lat'], locations['Kuala Lumpur']['lon'], locations[instance.text]['lat'], locations[instance.text]['lon']))
+        paths = graph.getPaths(instance.text)
+        print(str(len(paths)) + ' paths prepared')
+        p = paths[0].path
+
+        self.path = ""
         while len(p) > 0:
             self.path += str(p.popleft())+','
+        print(self.path)
         self.path = self.path[0:-1]
         self.path = self.path.replace(' ', '+')
         print(self.path)
