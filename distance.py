@@ -149,7 +149,7 @@ class MapGraph:
                 self.graph.add_edge(self.destinations[i], self.destinations[j], cost=distance)
     
     def getPathsCondition(self, destination, paths, r=[]):
-        print(len(paths))
+        #print(len(paths))
         if len(r) > 3:
             return
         for i in range(0, len(r)-1):
@@ -157,7 +157,7 @@ class MapGraph:
             p = self.graph.dijkstra('Kuala Lumpur', destination)
             paths.append(p)
             l = list(p.path)
-            print(p.path)
+            #print(p.path)
             try:
                 self.getPathsCondition(destination, paths, l)
             except:
@@ -247,17 +247,24 @@ if __name__ == '__main__':
     print("Bangkok to Kabul")
     calculate(13.6900, 100.7501, 34.5609, 69.2101)
 
-    graph = Graph([
-        ("a", "b", 7),  ("a", "c", 9),  ("a", "f", 14), ("b", "c", 10),
-        ("b", "d", 15), ("c", "d", 11), ("c", "f", 2),  ("d", "e", 6),
-        ("e", "f", 9),("a", "e", 7)])
+    # graph = Graph([
+    #     ("a", "b", 7),  ("a", "c", 9),  ("a", "f", 14), ("b", "c", 10),
+    #     ("b", "d", 15), ("c", "d", 11), ("c", "f", 2),  ("d", "e", 6),
+    #     ("e", "f", 9),("a", "e", 7)])
 
-    print(graph.dijkstra("a", "e"))
-    graph.remove_edge("a", "e")
-    a = graph.dijkstra("a", "d")
-    print(a)
-    while len(a) > 0:
-        print(a.popleft())
-    b = "abcd"
-    print(b[0:-1])
+    # print(graph.dijkstra("a", "e"))
+    # graph.remove_edge("a", "e")
+    # a = graph.dijkstra("a", "d")
+    # print(a)
+    # while len(a.path) > 0:
+    #     print(a.path.popleft())
+    # b = "abcd"
+    # print(b[0:-1])
+
+
+    print("Test MapGraph")
+    g = MapGraph()
+    p = g.getPaths('London')
+    print('SO')
+    print(p[0].path)
     
