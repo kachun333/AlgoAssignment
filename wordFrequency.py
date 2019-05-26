@@ -86,23 +86,22 @@ class CitySentiment:
 
         index = np.arange(N)
         width=0.35
-        plt.title(self.city)
-        plt.subplot(2,1,1)
-        plt.bar(index,ori_word,width,label="Original Word Count")
-        plt.bar(index + width, stop_word,width,label="Stop Word Count")
-        plt.ylabel("Word")
-        plt.title("Number of Word")
-        plt.xticks(index + width / 2, ('Article 1', 'Article 2', 'Article 3', 'Article 4', 'Article 5'))
-        plt.legend(loc='best')
+        fig, ax = plt.subplots()
+        ax.bar(index,ori_word,width,label="Original Word Count")
+        ax.bar(index + width, stop_word,width,label="Stop Word Count")
+        ax.set_ylabel("Word")
+        ax.set_title(str(self.city) + " - Number of Word")
+        ax.set_xticks(index + width / 2, ('Article 1', 'Article 2', 'Article 3', 'Article 4', 'Article 5'))
+        ax.legend(loc='best')
 
-        plt.subplot(2,1,2)
-        plt.bar(index,pos_word,width,label="Positive Word Count")
-        plt.bar(index + width, neg_word,width,label="Negative Word Count")
-        plt.ylabel("Word")
+        fig2, ax2 = plt.subplots()
+        ax2.bar(index,pos_word,width,label="Positive Word Count")
+        ax2.bar(index + width, neg_word,width,label="Negative Word Count")
+        ax2.set_ylabel("Word")
         #plt.title("Number of Word")
-        plt.xticks(index + width / 2, ('Article 1', 'Article 2', 'Article 3', 'Article 4', 'Article 5'))
-        plt.legend(loc='best')
-        return plt.gcf()
+        ax2.set_xticks(index + width / 2, ('Article 1', 'Article 2', 'Article 3', 'Article 4', 'Article 5'))
+        ax2.legend(loc='best')
+        return fig, fig2
 
 
 city = {}
@@ -131,7 +130,7 @@ if __name__ == "__main__":
     #     print(city.get(i) + ' is ' + str(theCity.sentiment()) + ' of sentiment\t')
     
     g  = MapGraph()
-    f = city['London'].graph()
+    f1, f2 = city['London'].graph()
     
     import datetime
     t = datetime.datetime.now()

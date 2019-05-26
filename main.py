@@ -1,8 +1,14 @@
 import random
 from math import *
 
-from kivy.core.window import Window 
-Window. size = (1000, 600)
+#from kivy.core.window import Window 
+#Window.size = (1280, 720)
+
+from kivy.config import Config
+#Config.set('kivy', 'log_level', 'debug')
+#Config.set('graphics', 'fullscreen', 'auto')
+Config.set('graphics', 'width', '2560')
+Config.set('graphics', 'height', '1440')
 
 from kivy.properties import NumericProperty, ObjectProperty, ListProperty, AliasProperty, BooleanProperty, StringProperty
 from kivy.app import App
@@ -21,14 +27,17 @@ from kivy.graphics import Color, Line
 from kivy.graphics.transformation import Matrix
 from kivy.graphics.context_instructions import Translate, Scale
 
-from kivy.garden.mapview import MapView, MapMarker, MapLayer#, MIN_LONGITUDE, MIN_LATITUDE, MAX_LATITUDE, MAX_LONGITUDE
-from mapview.utils import clamp
+#from kivy.garden.mapview import MapView, MapMarker, MapLayer#, MIN_LONGITUDE, MIN_LATITUDE, MAX_LATITUDE, MAX_LONGITUDE
+#from mapview.utils import clamp
 
 from kivy.garden.cefpython import CEFBrowser
+from kivy.garden.matplotlib.backend_kivyagg import FigureCanvas, NavigationToolbar2Kivy
 
-from lineMap import LineMapLayer
+#from lineMap import LineMapLayer
 from distance import *
 from distance import MapGraph
+from wordFrequency import CitySentiment, city
+from probability import probability
 
 # class MapViewApp(App):
 #     mapview = None
@@ -86,6 +95,11 @@ class MainScreen(BoxLayout):
         # p = graph.dijkstra('Kuala Lumpur', instance.text)
         # graph.add_edge('Kuala Lumpur', instance.text, cost=calculate(locations['Kuala Lumpur']['lat'], locations['Kuala Lumpur']['lon'], locations[instance.text]['lat'], locations[instance.text]['lon']))
         paths = graph.getPaths(instance.text)
+        cities = {}
+        for path in paths:
+            l = list(path.path)
+            for i in range(1, len(l)-1):
+                cities[l[i]] = True
         print(str(len(paths)) + ' paths prepared')
         p = paths[0].path
 
@@ -96,16 +110,31 @@ class MainScreen(BoxLayout):
         self.path = self.path[0:-1]
         self.path = self.path.replace(' ', '+')
         print(self.path)
-        self.line.coordinates=[[2.7456, 101.7072], [locations[instance.text]['lat'], locations[instance.text]['lon']]]
+        #self.line.coordinates=[[2.7456, 101.7072], [locations[instance.text]['lat'], locations[instance.text]['lon']]]
         self.left_label.text = 'From Kuala Lumpur\nTo {}'.format(self.destination)
         self.webview.url = "https://waixiong.github.io/AlgoAssisgnmentMap/map.html?path="+self.path+"&id=1234"
         #self.webview.reload()
+        self.right_layout.remove_widget(self.probabilityGraph)
+        self.right_layout.remove_widget(self.wordGraph)
+
+        self.probabilityGraph = probability(paths).canvas
+        self.wordGraph = BoxLayout()
+        for c in cities:
+            f1, f2 = city[c].graph()
+            b = BoxLayout(orientation = 'vertical')
+            b.add_widget(f1.canvas)
+            b.add_widget(f2.canvas)
+            self.wordGraph.add_widget(b)
+
+        self.right_layout.add_widget(self.probabilityGraph)
+        self.right_layout.add_widget(self.wordGraph)
 
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
         self.orientation = 'horizontal'
-        self.destination = 'Tokyo'
-        self.path = "Kuala+Lumpur,Tokyo"
+        self.destination = 'London'
+        paths = graph.getPaths('London')
+        self.path = "Kuala+Lumpur,Kabul,London"
         
         left_layout = BoxLayout(orientation = 'vertical')
         self.left_label = Label(text='From Kuala Lumpur\nTo {}'.format(self.destination))
@@ -115,26 +144,25 @@ class MainScreen(BoxLayout):
             #btn.bind(state=self.choose_destination)
             btn.bind(on_press=self.choose_destination)
             left_layout.add_widget(btn)
-        #b = BoxLayout(orientation='horizontal',height='32dp',size_hint_y=None)
-        #b.add_widget(Button(text="Zoom in",on_press=lambda a: setattr(self.mapview,'zoom',clamp(self.mapview.zoom+1, 3, 10))))
-        #b.add_widget(Button(text="Zoom out",on_press=lambda a: setattr(self.mapview,'zoom',clamp(self.mapview.zoom-1, 3, 10))))
-        #left_layout.add_widget(b)
         self.add_widget(left_layout)
         
-        self.mapview = MapView(zoom=8, lat=2.7456, lon=101.7072, size_hint=(1.8, 1))
-        #self.mapview.add_widget(MapMarker(lat=2.7456, lon=101.7072))
-        self.addMaker()
         # "./map.html?path=Kuala+Lumpur,Tokyo,New+York&id=1234"
-        self.webview = CEFBrowser(url="https://waixiong.github.io/AlgoAssisgnmentMap/map.html?path="+self.path+"&id=1234", size_hint=(1.8, 1))
+        self.webview = CEFBrowser(url="https://waixiong.github.io/AlgoAssisgnmentMap/map.html?path="+self.path+"&id=1234", size_hint=(3, 1))
         self.add_widget(self.webview)
-        self.line.reposition()
-        self.line.coordinates=[[2.7456, 101.7072], [2.7456, 101.7072]]
-    
-    def addMaker(self):
-        for l in locations.keys():
-            self.mapview.add_widget(MapMarker(lat=locations[l]['lat'], lon=locations[l]['lon']))
-        self.line = LineMapLayer()
-        self.mapview.add_layer(self.line, mode="scatter")
+        
+        self.right_layout = BoxLayout(orientation = 'vertical', size_hint=(2, 1))
+        self.probabilityGraph = probability(paths).canvas
+        self.right_layout.add_widget(self.probabilityGraph)
+        self.wordGraph = BoxLayout()
+        self.right_layout.add_widget(self.wordGraph)
+
+        f1, f2 = city['London'].graph()
+        b = BoxLayout(orientation = 'vertical')
+        b.add_widget(f1.canvas)
+        b.add_widget(f2.canvas)
+        self.wordGraph.add_widget(b)
+
+        self.add_widget(self.right_layout)
 
 
 class MyApp(App):
