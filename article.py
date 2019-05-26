@@ -1,18 +1,30 @@
 import time
 import os
 from RabinKarp import RabinKarp
+import json
 
 class article:
     #read file and store each words in a list named text
 
 
-    def __init__(self,filename):
+    def __init__(self, filename, cityName, text):
         text_file=open(filename,"r")
         self.__words = text_file.read().lower().split()
         text_file.close()
         self.__noStopWords = self.__words[:]
         self.__freqN = 0
         self.__freqP = 0
+        self.data = None
+        self.cityName = cityName
+        self.text = text
+        try:
+            with open(os.path.dirname(os.path.abspath(__file__))+"/Webpage_txt/"+self.text+'.json') as json_file:  
+                self.data = json.load(json_file)
+                json_file.close()
+            self.__freqN = self.data['N']
+            self.__freqP = self.data['P']
+        except:
+            pass
 
     #count number of words
     def getTotal(self, list):
@@ -36,6 +48,7 @@ class article:
      #Total num of words in file b4 removing stop words
     def getNoStopTotal(self):
         self.__noStopWords = self.__removeStop(self.__noStopWords)
+        #print(self.__noStopWords)
         return self.getTotal(self.__noStopWords)
 
     #dictionary of all words b4 removing stop Words
@@ -90,19 +103,25 @@ class article:
 
 
     def calculateWords(self):
+        self.data = {}
         ROOT = os.path.dirname(os.path.abspath(__file__))
         #Negative words
         text_file=open(ROOT+"/Webpage_txt/Negative Words Reference.txt","r")
-        pos_words = text_file.read().lower().split()
+        neg_words = text_file.read().lower().split()
         text_file.close()
 
         #positive words
         text_file=open(ROOT+"/Webpage_txt/Positive Words Reference.txt","r")
-        neg_words = text_file.read().lower().split()
+        pos_words = text_file.read().lower().split()
         text_file.close()
         #check all the words in the articles
         for i in self.__noStopWords:
             if(self.tempSearch(i,pos_words) == True):
                 self.__freqP += 1
-            else:
+            elif(self.tempSearch(i,neg_words) == True) :
                 self.__freqN += 1
+        self.data['N'] = self.__freqN
+        self.data['P'] = self.__freqP
+        with open(os.path.dirname(os.path.abspath(__file__))+"/Webpage_txt/"+self.text+'.json', 'w') as outfile:  
+            json.dump(self.data, outfile)
+            outfile.close()
