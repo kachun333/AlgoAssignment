@@ -7,7 +7,7 @@ final = 0
 
 from wordFrequency import CitySentiment, city
 import matplotlib
-matplotlib.use('module://kivy.garden.matplotlib.backend_kivy')
+#matplotlib.use('module://kivy.garden.matplotlib.backend_kivy')
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import numpy as np
@@ -53,11 +53,17 @@ def probability(paths):
     probabilityList = (paths[0].probability, paths[1].probability, paths[2].probability, paths[3].probability, paths[4].probability)
     index = np.arange(5)
     width=0.35
+    xLabel = []
+    for path in paths:
+        s = ''
+        for l in list(path.path):
+            s += l + '\n'
+        xLabel.append(s)
     fig, ax = plt.subplots()
-    ax.bar(index,probabilityList,width,label="Probability")
+    b = ax.bar(index,probabilityList,width, label="Probability", tick_label=xLabel)
     ax.set_ylabel("Probability")
     ax.set_title("Probability of Paths")
-    ax.set_xticks(index + width / 2, ('Path 1', 'Path 2', 'Path 3', 'Path 4', 'Path 5'))
+    ax.set_xticks(index + width / 2, ['Path 1', 'Path 2', 'Path 3', 'Path 4', 'Path 5'])
     ax.legend(loc='best')
 
     return fig

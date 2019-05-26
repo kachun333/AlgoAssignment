@@ -1,6 +1,7 @@
 import random
 from math import *
-
+import threading
+import multiprocessing.dummy as mp 
 #from kivy.core.window import Window 
 #Window.size = (1280, 720)
 
@@ -35,7 +36,7 @@ from kivy.garden.matplotlib.backend_kivyagg import FigureCanvas, NavigationToolb
 
 #from lineMap import LineMapLayer
 from distance import *
-from distance import MapGraph
+from distance import MapGraph, getP
 from wordFrequency import CitySentiment, city
 from probability import probability
 
@@ -76,7 +77,7 @@ locations['New York'] = {'lat':40.6413, 'lon':-73.7781}
 locations['Bangkok'] = {'lat':13.6900, 'lon':100.7501}
 locations['Kabul'] = {'lat':34.5609, 'lon':69.2101}
 #locations['California'] = {'lat':33.6762, 'lon':-117.8675} # testing purpose
-destinations = ['Kuala Lumpur', 'Brasilia', 'Tokyo', 'London', 'New York', 'Bangkok', 'Kabul']
+destinations = ['Brasilia', 'Tokyo', 'London', 'New York', 'Bangkok', 'Kabul']
 
 #initialize graph
 graph = MapGraph()
@@ -87,6 +88,13 @@ graph = MapGraph()
 
 
 class MainScreen(BoxLayout):
+
+    def add_bar_chart(self, c):
+        f1, f2 = city[c].graph()
+        b = BoxLayout(orientation = 'vertical')
+        b.add_widget(f1.canvas)
+        b.add_widget(f2.canvas)
+        self.wordGraph.add_widget(b)
 
     def choose_destination(self, instance):
         self.destination = instance.text
@@ -103,17 +111,6 @@ class MainScreen(BoxLayout):
         print(str(len(paths)) + ' paths prepared')
         p = paths[0].path
 
-        self.path = ""
-        while len(p) > 0:
-            self.path += str(p.popleft())+','
-        print(self.path)
-        self.path = self.path[0:-1]
-        self.path = self.path.replace(' ', '+')
-        print(self.path)
-        #self.line.coordinates=[[2.7456, 101.7072], [locations[instance.text]['lat'], locations[instance.text]['lon']]]
-        self.left_label.text = 'From Kuala Lumpur\nTo {}'.format(self.destination)
-        self.webview.url = "https://waixiong.github.io/AlgoAssisgnmentMap/map.html?path="+self.path+"&id=1234"
-        #self.webview.reload()
         self.right_layout.remove_widget(self.probabilityGraph)
         self.right_layout.remove_widget(self.wordGraph)
 
@@ -125,9 +122,31 @@ class MainScreen(BoxLayout):
             b.add_widget(f1.canvas)
             b.add_widget(f2.canvas)
             self.wordGraph.add_widget(b)
+        
+        # p = mp.Pool(3)
+        # theIterable = cities.keys()
+        # print('KEY ' + str(theIterable) + '$$$$$$$$$$$$$$')
+        # p.map(self.add_bar_chart,list(cities)) # range(0,1000) if you want to replicate your example
+        # p.close()
+        # p.join()
 
         self.right_layout.add_widget(self.probabilityGraph)
         self.right_layout.add_widget(self.wordGraph)
+
+        paths.sort(key=getP, reverse=True)
+        self.path = ""
+        for path in paths:
+            for cityP in list(path.path):
+                self.path += cityP+','
+            self.path = self.path[0:-1]
+            self.path += '|'
+        self.path = self.path[0:-1]
+        #self.path = self.path.replace(' ', '+')
+        print(self.path)
+        #self.line.coordinates=[[2.7456, 101.7072], [locations[instance.text]['lat'], locations[instance.text]['lon']]]
+        self.left_label.text = 'From Kuala Lumpur\nTo {}'.format(self.destination)
+        self.webview.url = "https://waixiong.github.io/AlgoAssisgnmentMap/map.html?paths="+self.path
+        #self.webview.reload()
 
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
@@ -147,7 +166,7 @@ class MainScreen(BoxLayout):
         self.add_widget(left_layout)
         
         # "./map.html?path=Kuala+Lumpur,Tokyo,New+York&id=1234"
-        self.webview = CEFBrowser(url="https://waixiong.github.io/AlgoAssisgnmentMap/map.html?path="+self.path+"&id=1234", size_hint=(3, 1))
+        self.webview = CEFBrowser(url="https://waixiong.github.io/AlgoAssisgnmentMap/map.html?paths="+self.path+"&id=1234", size_hint=(3, 1))
         self.add_widget(self.webview)
         
         self.right_layout = BoxLayout(orientation = 'vertical', size_hint=(2, 1))

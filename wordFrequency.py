@@ -87,8 +87,8 @@ class CitySentiment:
         index = np.arange(N)
         width=0.35
         fig, ax = plt.subplots()
-        ax.bar(index,ori_word,width,label="Original Word Count")
-        ax.bar(index + width, stop_word,width,label="Stop Word Count")
+        b11 = ax.bar(index,ori_word,width,label="Original Word Count")
+        b12 = ax.bar(index + width, stop_word,width,label="Stop Word Count")
         ax.set_ylabel("Word")
         ax.set_title(str(self.city) + " - Number of Word")
         ax.set_xticks(index + width / 2, ('Article 1', 'Article 2', 'Article 3', 'Article 4', 'Article 5'))
@@ -131,11 +131,10 @@ if __name__ == "__main__":
     
     g  = MapGraph()
     f1, f2 = city['London'].graph()
-    
     import datetime
     t = datetime.datetime.now()
     print(type(city['London'].graph()))
-    print(datetime.datetime.now() - t)
+    print('Time Taken'+str(datetime.datetime.now() - t))
     paths = g.getPaths('Brasilia')
 
     totalDistanceP = 0 # ignore this line use ur totalPath
@@ -166,5 +165,7 @@ if __name__ == "__main__":
         print('for path '+str(path.path))
         print(path.distance)
         print('the probability is ' + str(pathProb)+'\n')
+    
+    print(type(range(1, 5)))
 
 
