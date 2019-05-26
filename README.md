@@ -32,6 +32,10 @@ Then ```git clone https://github.com/allestuetsmerweh/garden.cefpython.git```
 
 https://github.com/allestuetsmerweh/garden.cefpython
 
+### Install kivy.mapview
+then after install garden
+
+```garden install matplotlib```
 
 ## Run
 Go to cmd, then 'cd' project directory
