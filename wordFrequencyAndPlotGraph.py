@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from article import article;
 plt.style.use('ggplot')
 
+from wordFrequency import CitySentiment, city
+
 
 def sentiment():
     sum=0
@@ -12,10 +14,10 @@ def sentiment():
     return sum/5
 
 #user input
-city = {1:"Brasilia", 2:"NewYork", 3:"London", 4:"Bangkok", 5:"Kabul", 6:"Tokyo"}
+city = {1:"Brasilia", 2:"New York", 3:"London", 4:"Bangkok", 5:"Kabul", 6:"Tokyo"}
 #print(city)
 # city_chosen = int(input("Choose a city by key in its number"))
-city_chosen = 1
+city_chosen = 2
 
 #specify path
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -29,7 +31,11 @@ for x in files:
     filename = path+"/"+files[i]
     print(filename)
     articles.append(article(filename))
+    articles[i].calculateWords()
     print("Article " + str(i) + ": " + str(articles[i].getNoStopTotal())+ " FROM " + str(articles[i].getOriTotal()))
+    print("article pos word is " + str(articles[i].getPosCount()))
+    print("article neg word is " + str(articles[i].getNegCount()))
+    print("polarity is " + str(articles[i].getPolarity()))
     i +=1
 
 
@@ -61,7 +67,7 @@ plt.subplot(2,1,2)
 plt.bar(index,pos_word,width,label="Positive Word Count")
 plt.bar(index + width, neg_word,width,label="Negative Word Count")
 plt.ylabel("Word")
-plt.title("Number of Word")
+#plt.title("Number of Word")
 plt.xticks(index + width / 2, ('Article 1', 'Article 2', 'Article 3', 'Article 4', 'Article 5'))
 plt.legend(loc='best')
 plt.show()
