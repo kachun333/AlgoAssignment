@@ -17,6 +17,7 @@ class article:
         self.data = None
         self.cityName = cityName
         self.text = text
+        self.getNoStopWords()
         try:
             with open(os.path.dirname(os.path.abspath(__file__))+"/Webpage_txt/"+self.text+'.json') as json_file:  
                 self.data = json.load(json_file)
@@ -117,8 +118,10 @@ class article:
         #check all the words in the articles
         for i in self.__noStopWords:
             if(self.tempSearch(i,pos_words) == True):
+                print(' ++ '+str(i))
                 self.__freqP += 1
             elif(self.tempSearch(i,neg_words) == True) :
+                print(' -- '+str(i))
                 self.__freqN += 1
         self.data['N'] = self.__freqN
         self.data['P'] = self.__freqP

@@ -102,14 +102,14 @@ class MainScreen(BoxLayout):
         # graph.remove_edge('Kuala Lumpur', instance.text)
         # p = graph.dijkstra('Kuala Lumpur', instance.text)
         # graph.add_edge('Kuala Lumpur', instance.text, cost=calculate(locations['Kuala Lumpur']['lat'], locations['Kuala Lumpur']['lon'], locations[instance.text]['lat'], locations[instance.text]['lon']))
-        paths = graph.getPaths(instance.text)
+        paths = graph.getPaths(instance.text) ## distance.py Joyen
         cities = {}
         for path in paths:
             l = list(path.path)
             for i in range(1, len(l)-1):
                 cities[l[i]] = True
         print(str(len(paths)) + ' paths prepared')
-        p = paths[0].path
+        #p = paths[0].path
 
         self.right_layout.remove_widget(self.probabilityGraph)
         self.right_layout.remove_widget(self.wordGraph)

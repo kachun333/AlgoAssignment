@@ -87,8 +87,8 @@ class CitySentiment:
         index = np.arange(N)
         width=0.35
         fig, ax = plt.subplots()
-        b11 = ax.bar(index,ori_word,width,label="Original Word Count")
-        b12 = ax.bar(index + width, stop_word,width,label="Stop Word Count")
+        ax.bar(index,ori_word,width,label="Original Word Count")
+        ax.bar(index + width, stop_word,width,label="Stop Word Count")
         ax.set_ylabel("Word")
         ax.set_title(str(self.city) + " - Number of Word")
         ax.set_xticks(index + width / 2, ('Article 1', 'Article 2', 'Article 3', 'Article 4', 'Article 5'))
