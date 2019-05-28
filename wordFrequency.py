@@ -5,7 +5,7 @@ import json
 from distance import MapGraph
 
 import matplotlib
-matplotlib.use('module://kivy.garden.matplotlib.backend_kivy')
+#matplotlib.use('module://kivy.garden.matplotlib.backend_kivy')
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import numpy as np
@@ -102,6 +102,45 @@ class CitySentiment:
         ax2.set_xticks(index + width / 2, ('Article 1', 'Article 2', 'Article 3', 'Article 4', 'Article 5'))
         ax2.legend(loc='best')
         return fig, fig2
+    
+    def graphStandalone(self):
+
+        # if len(self.articles) == 0:
+        #     # if didn't scan articles yet then scan else skip this 
+        #     p = mp.Pool(5)
+        #     p.map(self.MPsentiment,range(0,5)) # range(0,1000) if you want to replicate your example
+        #     p.close()
+        #     p.join()
+        
+        for i in range(0, 5):
+            self.MPsentiment(i)
+
+        N=5
+        ori_word = (int(self.articles[0].getOriTotal()), int(self.articles[1].getOriTotal()),int(self.articles[2].getOriTotal()),int(self.articles[3].getOriTotal()),int(self.articles[4].getOriTotal()))
+        stop_word = (int(self.articles[0].getNoStopTotal()), int(self.articles[1].getNoStopTotal()),int(self.articles[2].getNoStopTotal()), int(self.articles[3].getNoStopTotal()), int(self.articles[4].getNoStopTotal()))
+
+        pos_word = (int(self.articles[0].getPosCount()),int(self.articles[1].getPosCount()),int(self.articles[2].getPosCount()),int(self.articles[3].getPosCount()),int(self.articles[4].getPosCount()))
+        neg_word = (int(self.articles[0].getNegCount()),int(self.articles[1].getNegCount()),int(self.articles[2].getNegCount()),int(self.articles[3].getNegCount()),int(self.articles[4].getNegCount()))
+
+        index = np.arange(N)
+        width=0.35
+        plt.subplot(2, 1, 1)
+        plt.bar(index,ori_word,width,label="Original Word Count")
+        plt.bar(index + width, stop_word,width,label="Stop Word Count")
+        plt.ylabel("Word")
+        plt.title(str(self.city) + " - Number of Word")
+        plt.xticks(index + width / 2, ('Article 1', 'Article 2', 'Article 3', 'Article 4', 'Article 5'))
+        plt.legend(loc='best')
+
+        plt.subplot(2, 1, 2)
+        plt.bar(index,pos_word,width,label="Positive Word Count")
+        plt.bar(index + width, neg_word,width,label="Negative Word Count")
+        plt.ylabel("Word")
+        #plt.title("Number of Word")
+        plt.xticks(index + width / 2, ('Article 1', 'Article 2', 'Article 3', 'Article 4', 'Article 5'))
+        plt.legend(loc='best')
+        
+        plt.show()
 
 
 city = {}
@@ -129,43 +168,19 @@ if __name__ == "__main__":
     #     print(city.get(i) + ' is ' + str(theCity.sentiment()) + ' of sentiment')
     #     print(city.get(i) + ' is ' + str(theCity.sentiment()) + ' of sentiment\t')
     
-    g  = MapGraph()
-    f1, f2 = city['London'].graph()
-    import datetime
-    t = datetime.datetime.now()
-    print(type(city['London'].graph()))
-    print('Time Taken'+str(datetime.datetime.now() - t))
-    paths = g.getPaths('Brasilia')
+    listOfCities = {1:"Brasilia", 2:"New York", 3:"London", 4:"Bangkok", 5:"Kabul", 6:"Tokyo"}
+    print(listOfCities)
+    city_chosen = int(input("Choose a city according to its number: "))
 
-    totalDistanceP = 0 # ignore this line use ur totalPath
-    totalPoli = 0
+    city[listOfCities[city_chosen]].graphStandalone()
 
-    # calculate for sentiment for every path in paths
-    for path in paths:
-        print(path.path)
-        print(path.distance)
-        pathSentiment = 0
-        pathList = list(path.path)
-        # for i in range(1, len(pathList)-1):
-        #    pathSentiment += city.get(pathList[i]).sentiment()
-        # pathSentiment /= len(pathList) - 2 
-        # print('The sentiment of the path is ' + str(pathSentiment) + '\n')
-        path.pathSentiment = pathSentiment
+    # g  = MapGraph()
+    # paths = g.getPaths(listOfCities[city_chosen])
 
-        totalDistanceP += 1 / (path.distance * (paths.index(path)+1)) 
-        totalPoli += path.pathSentiment
-    
-    # calculate probability
-    for path in paths:
-        pathProb = (1/(path.distance * (paths.index(path)+1))) / totalDistanceP
-        #sentimentProb = path.pathSentiment / totalPoli
-        
-        #prob = (pathProb + sentimentProb) / 2
-
-        print('for path '+str(path.path))
-        print(path.distance)
-        print('the probability is ' + str(pathProb)+'\n')
-    
-    print(type(range(1, 5)))
+    # for path in paths:
+    #     print('For path ' + str(path.path))
+    #     pathL = list(path.path)
+    #     for l in range(1, len(pathL)-1):
+    #         city[pathL[l]].graphStandalone()
 
 

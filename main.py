@@ -32,6 +32,11 @@ from kivy.graphics.context_instructions import Translate, Scale
 #from mapview.utils import clamp
 
 from kivy.garden.cefpython import CEFBrowser
+import matplotlib
+matplotlib.use('module://kivy.garden.matplotlib.backend_kivy')
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
+import numpy as np
 from kivy.garden.matplotlib.backend_kivyagg import FigureCanvas, NavigationToolbar2Kivy
 
 #from lineMap import LineMapLayer
