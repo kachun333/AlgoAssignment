@@ -104,6 +104,7 @@ class article:
 
 
     def calculateWords(self):
+        print('\tCalculating word...')
         self.data = {}
         ROOT = os.path.dirname(os.path.abspath(__file__))
         #Negative words
@@ -118,10 +119,10 @@ class article:
         #check all the words in the articles
         for i in self.__noStopWords:
             if(self.tempSearch(i,pos_words) == True):
-                print(' ++ '+str(i))
+                print('\t ++ '+str(i))
                 self.__freqP += 1
             elif(self.tempSearch(i,neg_words) == True) :
-                print(' -- '+str(i))
+                print('\t -- '+str(i))
                 self.__freqN += 1
         self.data['N'] = self.__freqN
         self.data['P'] = self.__freqP
