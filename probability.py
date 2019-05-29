@@ -81,6 +81,7 @@ def probabilityStandalone(paths):
         
         pathSentiment /= len(pathList) - 2 
         path.pathSentiment = pathSentiment
+        # O(mn)
 
     for path in paths:
         print(path.path)
@@ -94,6 +95,9 @@ def probabilityStandalone(paths):
         # Shortest path + Political sentiment
         path.probability = (path.pathProb + path.sentimentProb) / 2
         print("Total probability of this route: " + str(path.probability) + "\n")
+        # O(n)
+    
+    # O(mn)
     
     probabilityList = (paths[0].probability, paths[1].probability, paths[2].probability, paths[3].probability, paths[4].probability)
     index = np.arange(5)

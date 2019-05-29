@@ -118,7 +118,7 @@ class CitySentiment:
         N=5
         ori_word = (int(self.articles[0].getOriTotal()), int(self.articles[1].getOriTotal()),int(self.articles[2].getOriTotal()),int(self.articles[3].getOriTotal()),int(self.articles[4].getOriTotal()))
         stop_word = (int(self.articles[0].getNoStopTotal()), int(self.articles[1].getNoStopTotal()),int(self.articles[2].getNoStopTotal()), int(self.articles[3].getNoStopTotal()), int(self.articles[4].getNoStopTotal()))
-
+        
         pos_word = (int(self.articles[0].getPosCount()),int(self.articles[1].getPosCount()),int(self.articles[2].getPosCount()),int(self.articles[3].getPosCount()),int(self.articles[4].getPosCount()))
         neg_word = (int(self.articles[0].getNegCount()),int(self.articles[1].getNegCount()),int(self.articles[2].getNegCount()),int(self.articles[3].getNegCount()),int(self.articles[4].getNegCount()))
 
@@ -183,4 +183,12 @@ if __name__ == "__main__":
     #     for l in range(1, len(pathL)-1):
     #         city[pathL[l]].graphStandalone()
 
+    print(city[listOfCities[city_chosen]].sentiment())
 
+
+# Brasilia  0.004814841674599791
+# New York  0.01791518618874715
+# London    0.02853958549118011
+# Bangkok   0.005699998964845554
+# Kabul     0.0057077767401467255
+# Tokyo     0.022458310532577082
